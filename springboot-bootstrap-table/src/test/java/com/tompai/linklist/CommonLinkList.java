@@ -530,4 +530,26 @@ public class CommonLinkList {
 		pref.next = head;
 		return slow;
 	}
+
+	/*NC186 两两交换链表的节点
+	给你一个链表，请你两两交换相邻节点，你需要真正交换节点本身，而不是修改节点的值。
+	两两交换示例：
+	链表    ：1->2->3->4
+	交换后 ：2->1->4->3*/
+	public ListNode swapLinkedPair (ListNode head) {
+		// write code here
+		ListNode dummy = new ListNode(-1);
+		dummy.next = head;
+		ListNode t = dummy;
+		while(t!=null){
+			ListNode first = t.next;
+			if(first==null||first.next==null) break;
+			ListNode second = first.next;
+			t.next = second;
+			first.next = second.next;
+			second.next = first;
+			t = first;
+		}
+		return dummy.next;
+	}
 }

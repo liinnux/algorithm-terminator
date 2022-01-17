@@ -69,6 +69,35 @@ public class Tree {
 		preOrder(root.left);
 		preOrder(root.right);
 	}
+	/*NC193 二叉树的前序遍历
+	给你二叉树的根节点 root ，返回它节点值的 前序 遍历。*/
+	public int[] preorderTraversal (TreeNode root) {
+		if(root == null){
+			return new int[0];
+		}
+
+		List<Integer> list = new ArrayList<>();
+		Stack<TreeNode> stack = new Stack<>();
+
+		TreeNode node = root;
+		while(node != null || !stack.isEmpty()){
+			while(node != null){
+				list.add(node.val);
+				stack.push(node);
+				node = node.left;
+			}
+
+			if(!stack.isEmpty()){
+				node = stack.pop();
+				node = node.right;
+			}
+		}
+		int[] arr = new int[list.size()];
+		for(int i = 0; i < list.size();i++){
+			arr[i] = list.get(i);
+		}
+		return arr;
+	}
 
 	public void inOrder(TreeNode root) {
 		if (root == null) {
@@ -79,6 +108,28 @@ public class Tree {
 		inOrder(root.right);
 	}
 
+	/*NC161 二叉树的中序遍历(左-中-右)
+	给定一个二叉树的根节点root，返回它的中序遍历结果。*/
+	public int[] inorderTraversal (TreeNode root) {
+		// write code here
+		List<Integer> list = new ArrayList<>();
+		int[] ans = new int[list.size()];
+		if(root == null) return ans;
+		list = inOrder(root,list);
+		int[] res = new int[list.size()];
+		for(int i = 0;i < list.size();i++){
+			res[i] = list.get(i);
+		}
+		return res;
+	}
+	private List<Integer> inOrder(TreeNode root,List<Integer> list){
+		if(root == null) return null;
+		inOrder(root.left,list);
+		list.add(root.val);
+		inOrder(root.right,list);
+		return list;
+	}
+
 	public void afterOrder(TreeNode root) {
 		if (root == null) {
 			return;
@@ -86,6 +137,40 @@ public class Tree {
 		afterOrder(root.left);
 		afterOrder(root.right);
 		list.add(root.val);
+	}
+
+	/*NC192 二叉树的后序遍历(左-右-中)
+	给定一个二叉树，返回他的后序遍历的序列。
+	后序遍历是值按照 左节点->右节点->根节点 的顺序的遍历。*/
+	public int[] afterOrderTraversal (TreeNode root) {
+		// write code here
+		if (root == null) {
+			return new int[0];
+		}
+		List<Integer> list = new LinkedList<>();
+		TreeNode pre = null;
+		Stack<TreeNode> stack = new Stack<>();
+		//设置一个前驱节点
+		while (root != null || !stack.isEmpty()) {
+			while (root != null) {
+				stack.push(root);
+				root = root.left;
+				//如果没有到左子树最底下的点，继续入栈
+			}
+			//取出最后一个元素，就是我们的后序遍历的第一个元素
+			root = stack.pop();
+			if (root.right != null && root.right != pre) {
+				stack.push(root);
+				root = root.right;
+				//我们这个点不空，然后且不是上一个节点，我们继续入栈
+			} else {
+				System.out.println(root.val);
+				list.add(root.val);
+				pre = root;
+				root = null;
+			}
+		}
+		return list.stream().mapToInt(Integer::intValue).toArray();
 	}
 
 	/**
@@ -1377,8 +1462,25 @@ public class Tree {
         }
         return result;
     }
-    
-    
+	/*NC215 将二叉搜索树改为累加树
+	给定一个二叉搜索树，树上的节点各不相同，请你将其修改为累加树，使每个节点的值变成原树中更大节点之和。
+	二叉搜索树的定义是任一节点的左子树的任意节点的值小于根节点的值，右子树则相反。*/
+	public TreeNode convertToAddBST(TreeNode root) {
+		// write code here
+		if (root == null)
+			return null;
+		dfs_add(root);
+		return root;
+	}
+	int sum = 0;
+	public void dfs_add(TreeNode root) {
+		if (root == null)
+			return;
+		dfs_add(root.right);
+		sum += root.val;
+		root.val = sum;
+		dfs_add(root.left);
+	}
     
     
 	/**
