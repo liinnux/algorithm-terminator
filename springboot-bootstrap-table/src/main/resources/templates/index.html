@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Demo Table</title>
+<th:block th:include="include :: header('表格示例')" />
+</head>
+<body>
+	<section class="content-header">
+	<h2>User Management System(UMS)</h2>
+	</section>
+	<section class="content table-content">
+	<form class="form-inline">
+		<!-- 工具栏 -->
+		<div id="toolbar">
+
+			<button id="addBtn" data-toggle="modal" data-target="#addUserModal"
+				class="btn btn-primary" value="新增用户">
+				<i class="glyphicon glyphicon-plus"></i> Add
+			</button>
+
+			<button id="editBtn" data-toggle="modal" data-target="#editUserModal"
+				class="btn btn-warning" value="修改用户" onclick="editUser()">
+				<i class="glyphicon  glyphicon-pencil"></i> Edit
+			</button>
+
+			<button id="deleteBtn" data-toggle="modal"
+				data-target="#deleteUserModal" class="btn btn-success" value="删除用户"
+				onclick="deleteUser()">
+				<i class="glyphicon glyphicon-remove"></i> Delete
+			</button>
+
+			<button id="refreshBtn" data-toggle="modal"
+				data-target="#refreshUserModal" class="btn btn-info" value="刷新用户"
+				onclick="refreshUser()">
+				<i class="glyphicon glyphicon-refresh"></i> Refresh
+			</button>
+
+			<button id="userDemo" data-toggle="modal" class="btn btn-danger " value="表格示例">
+				<a href="demo/operate/table" target="_blank"> 
+				<i class="glyphicon glyphicon-home"></i> Demo
+				</a>
+			</button>
+
+		</div>
+
+	</form>
+	<!-- bootstrapTable -->
+	<div class="row">
+		<div class="col-sm-12 select-table table-striped">
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+	</section>
+	<!-- 新增用户的模态框，在修改用户中将获取一行的值放入input中，改变一些参数继续使用 -->
+	<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>新增用户</h3>
+				</div>
+				<div class="modal-body">
+					<form id="addUserForm" action="/user/addUser" method="post"
+						class="form-horizontal">
+
+						<div class="form-group">
+							<label for="inputName" class="col-sm-2 control-label">姓名</label>
+							<div class="col-sm-7">
+								<input type="name" name="name" class="col-sm-4 form-control"
+									id="inputName" placeholder="姓名" />
+							</div>
+							<label id="errorName" for="inputName"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputNickName" class="col-sm-2 control-label">昵称</label>
+							<div class="col-sm-7">
+								<input type="nickname" name="nickname"
+									class="col-sm-4 form-control" id="inputNickName"
+									placeholder="昵称" />
+							</div>
+							<label id="errorNickName" for="inputNickName"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputPassword" class="col-sm-2 control-label">密码</label>
+							<div class="col-sm-7">
+								<input type="password" name="password"
+									class="col-sm-4 form-control" id="inputPassword"
+									placeholder="密码" />
+							</div>
+							<label id="errorPassword" for="inputPassword"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputAge" class="col-sm-2 control-label">年龄</label>
+							<div class="col-sm-7">
+								<input type="age" name="age" class="col-sm-4 form-control"
+									id="inputAge" placeholder="年龄" />
+							</div>
+							<label id="errorAge" for="inputAge"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputState" class="col-sm-2 control-label">状态</label>
+							<div class="col-sm-7">
+								<input type="state" name="state" class="col-sm-4 form-control"
+									id="inputState" placeholder="状态" />
+							</div>
+							<label id="errorState" for="inputState"
+								class="col-sm-3 control-label"></label>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="conf" class="btn btn-default"
+						onclick="addUser()">确定</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"
+						onclick="resetAddModal()">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 修改用户的模态框 -->
+	<div class="modal fade" id="editModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>修改用户</h3>
+				</div>
+				<div class="modal-body">
+					<form id="editForm" method="post" class="form-horizontal">
+						<div class="form-group" style="display: none">
+							<label for="editId" class="col-sm-2 control-label">ID</label>
+							<div class="col-sm-7">
+								<input type="id" name="id" class="form-control" id="editId"
+									placeholder="ID" />
+							</div>
+							<label id="errorId" for="editId" class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputName" class="col-sm-2 control-label">姓名</label>
+							<div class="col-sm-7">
+								<input type="name" name="name" class="col-sm-4 form-control"
+									id="editName" placeholder="姓名" />
+							</div>
+							<label id="errorName" for="inputName"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputNickName" class="col-sm-2 control-label">昵称</label>
+							<div class="col-sm-7">
+								<input type="nickname" name="nickname"
+									class="col-sm-4 form-control" id="editNickName"
+									placeholder="昵称" />
+							</div>
+							<label id="errorNickName" for="inputNickName"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="inputAge" class="col-sm-2 control-label">年龄</label>
+							<div class="col-sm-7">
+								<input type="age" name="age" class="col-sm-4 form-control"
+									id="editAge" placeholder="年龄" />
+							</div>
+							<label id="errorAge" for="inputAge"
+								class="col-sm-3 control-label"></label>
+						</div>
+						<div class="form-group">
+							<label for="editState" class="col-sm-2 control-label">状态</label>
+							<div class="col-sm-7">
+								<input type="state" name="state" class="col-sm-4 form-control"
+									id="editState" placeholder="状态" />
+							</div>
+							<label id="errorState" for="editState"
+								class="col-sm-3 control-label"></label>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="conf" class="btn btn-default"
+						onclick="updateUser()">确定</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"
+						onclick="resetAddModal()">取消</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="Tip" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>新增提示</h3>
+				</div>
+				<div class="modal-body" align="center">
+					<h4 id="tipContent">新增成功</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="updateEnd" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>修改提示</h3>
+				</div>
+				<div class="modal-body" align="center">
+					<h4 id="al">修改成功</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="deleteEnd" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>删除提示</h3>
+				</div>
+				<div class="modal-body" align="center">
+					<h4 id="deleteTipContent">删除成功</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<div th:include="include :: footer"></div>
+<div th:include="include :: user-js"></div>
+</html>

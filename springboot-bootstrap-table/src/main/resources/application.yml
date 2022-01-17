@@ -1,0 +1,70 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    
+# Spring配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db_user?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: root
+    password: Root12345
+    test-on-borrow: true
+    test-while-idle: true
+    dbcp2:      validation-query: SELECT 1 FROM DUAL      time-between-eviction-runs-millis: 300000
+      min-evictable-idle-time-millis: 1800000
+             # 模板引擎
+  thymeleaf:
+    mode: HTML
+    encoding: utf-8
+        # 禁用缓存
+    cache: false
+    #prefix: classpath:/static/
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  profiles: 
+    active: druid
+       # 文件上传
+  servlet:
+     multipart:
+       # 单个文件大小
+       max-file-size:  10MB
+       # 设置总上传的文件大小
+       max-request-size:  20MB
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: true 
+    
+pagehelper:
+  helper-dialect: mysql
+  reasonable: false
+  support-methods-arguments: true
+  params: count=countSql
+  
+  
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.tompai.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+#mybatis-plus:
+#  mapper-locations: classpath:mapping/*.xml
+#  type-aliases-package: com.tompai.entity
+
+tompai:
+  # 名称
+  name: Tompai
+  # 版本
+  version: 1.0.0
+  # 版权年份
+  copyrightYear: 2030
+  # 实例演示开关
+  demoEnabled: true
+  profile: tompai_path
+  # 获取ip地址开关
+  addressEnabled: true
