@@ -56,7 +56,8 @@ public class CommonString {
 		return new String(cstr);
 	}
 
-	//对于长度为n的一个字符串A（仅包含数字，大小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度。
+	/*NC17 最长回文子串
+	对于长度为n的一个字符串A（仅包含数字，大小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度。*/
 	public int getLongestPalindrome(String A, int n) {
 		// 动态规划：i到j的子串是否是回文子串
 		boolean[][] dp = new boolean[n][n];
@@ -88,7 +89,7 @@ public class CommonString {
 		return max;
 	}
 
-	////对于长度为n的一个字符串A（仅包含数字，大小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度。
+	//对于长度为n的一个字符串A（仅包含数字，大小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度。
 	public int getLongestPalindrome(String A) {
 		int max = 0;
 		int lengthA = A.length();

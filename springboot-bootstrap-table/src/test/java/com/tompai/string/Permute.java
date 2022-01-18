@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * @author Administrator
+ NC42 有重复项数字的所有排列
  给出一组可能包含重复项的数字，返回该组数字的所有排列。结果以字典序升序排列。
  */
 public class Permute {

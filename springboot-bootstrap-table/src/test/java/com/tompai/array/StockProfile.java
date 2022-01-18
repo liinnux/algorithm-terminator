@@ -4,6 +4,7 @@
 package com.tompai.array;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 /**
  * @author Administrator
@@ -20,12 +21,13 @@ public class StockProfile {
 	}
 
 	/*
+	NC7 买卖股票的最好时机(一)-可以买入一次股票和卖出一次股票
 	 假设你有一个数组prices，长度为n，其中prices[i]是股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
 	1.你可以买入一次股票和卖出一次股票，并非每天都可以买入或卖出一次，总共只能买入和卖出一次，且买入必须在卖出的前面的某一天
 	2.如果不能获取到任何利润，请返回0
 	3.假设买入卖出均无手续费
 	 */
-	public int maxProfit2(int[] prices) {
+	public int maxProfit01(int[] prices) {
 		// write code here
 		int len = prices.length;
 		// 特殊判断
@@ -33,14 +35,11 @@ public class StockProfile {
 			return 0;
 		}
 		int[][] dp = new int[len][2];
-
 		// dp[i][0] 下标为 i 这天结束的时候，不持股，手上拥有的现金数
 		// dp[i][1] 下标为 i 这天结束的时候，持股，手上拥有的现金数
-
 		// 初始化：不持股显然为 0，持股就需要减去第 1 天（下标为 0）的股价
 		dp[0][0] = 0;
 		dp[0][1] = -prices[0];
-
 		// 从第 2 天开始遍历
 		for (int i = 1; i < len; i++) {
 			dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
@@ -50,12 +49,13 @@ public class StockProfile {
 	}
 
 	/*
+	NC7 买卖股票的最好时机(一)
 	 假设你有一个数组prices，长度为n，其中prices[i]是股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
 	1.你可以买入一次股票和卖出一次股票，并非每天都可以买入或卖出一次，总共只能买入和卖出一次，且买入必须在卖出的前面的某一天
 	2.如果不能获取到任何利润，请返回0
 	3.假设买入卖出均无手续费
 	 */
-	public int maxProfit(int[] prices) {
+	public int maxProfit01_1(int[] prices) {
 		//贪心
 		int min = prices[0], max = 0;
 		for (int i = 1; i < prices.length; i++) {
@@ -67,7 +67,37 @@ public class StockProfile {
 		return max;
 	}
 
-	/*假设你有一个数组prices，长度为n，其中prices[i]是某只股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
+	/*
+	NC7 买卖股票的最好时机(一)
+	 假设你有一个数组prices，长度为n，其中prices[i]是股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
+	1.你可以买入一次股票和卖出一次股票，并非每天都可以买入或卖出一次，总共只能买入和卖出一次，且买入必须在卖出的前面的某一天
+	2.如果不能获取到任何利润，请返回0
+	3.假设买入卖出均无手续费
+	 */
+	/*单调栈： 维护着一个最具竞争力的递增序列*/
+	public int maxProfit01_2(int[] prices) {
+		int len = prices.length;
+		Stack<Integer> s = new Stack<>();
+		// 可以在 prices[len] 位置放一个 -1 的哨兵
+		// 这样可以让单调递增的数组中所有的元素逼出去
+		int ans = 0;
+		for (int i = 0; i < prices.length; i++) {
+			while (s.size() > 0 && s.peek() > prices[i]) {
+				ans = Math.max(ans, s.peek() - s.firstElement());
+				s.pop();
+			}
+			s.add(prices[i]);
+		}
+		// 模拟哨兵行为
+		if (s.size() > 0)
+			ans = Math.max(ans, s.peek() - s.firstElement());
+
+		return ans;
+	}
+
+	/*
+	NC134 买卖股票的最好时机(二)可以多次买卖该只股票
+	假设你有一个数组prices，长度为n，其中prices[i]是某只股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
 	1. 你可以多次买卖该只股票，但是再次购买前必须卖出之前的股票
 	2. 如果不能获取收益，请返回0
 	3. 假设买入卖出均无手续费
@@ -80,68 +110,57 @@ public class StockProfile {
 	总获利1+3+3=7，返回7
 	*/
 	public int maxProfit02(int[] prices) {
-		int ans = 0;
+		int ans = 0, tmp = 0;
 		for (int i = 1; i < prices.length; i++) {
-			if (prices[i] > prices[i - 1]) {
-				ans += prices[i] - prices[i - 1];
+			tmp = prices[i] - prices[i - 1];
+			if (tmp > 0) {
+				ans += tmp;
 			}
-
 		}
 		return ans;
 	}
-	
-	/*买卖股票的最好时机(三)
+
+	public int maxProfit02_1(int[] prices) {
+		if (prices == null || prices.length < 2)
+			return 0;
+		int length = prices.length;
+		//初始条件
+		int hold = -prices[0];//持有股票
+		int noHold = 0;//没持有股票
+		for (int i = 1; i < length; i++) {
+			//递推公式转化的
+			noHold = Math.max(noHold, hold + prices[i]);
+			hold = Math.max(hold, noHold - prices[i]);
+		}
+		//最后一天肯定是手里没有股票的时候利润才会最大，
+		//所以这里返回的是noHold
+		return noHold;
+	}
+
+	/*买卖股票的最好时机(三)-最多可以对该股票有两笔交易
 	假设你有一个数组prices，长度为n，其中prices[i]是某只股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
 	1. 你最多可以对该股票有两笔交易操作，一笔交易代表着一次买入与一次卖出，但是再次购买前必须卖出之前的股票
 	2. 如果不能获取收益，请返回0
 	3. 假设买入卖出均无手续费*/
-	public int maxProfit03 (int[] prices) {
-        // write code here
-        if (prices.length == 0) return 0;
-        /*
-        5个状态标记：
-        1）不操作
-        2）第一次购买
-        3）第一次卖出
-        4）第二次购买
-        5）第二次卖出
-        dp[i][j]代表第i天状态为j时产生的最大收益
-        */
-        int [][]dp = new int[prices.length][5];
-        //初始化
-        dp[0][1] = -prices[0];
-        dp[0][3] = -prices[0];
-        for (int i = 1; i <= prices.length; i++) {
-            dp[i][0] = dp[i - 1][0];
-            //其中dp[i][1]有两个操作1）第i天没有操作2）第i天买入股票，所以此时最大收益，应该为这两个操作比大小
-            dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
-            //其中dp[i][2]有两个操作1）第i天没有操作2）第i天卖出股票，所以此时最大收益，应该为这两个操作比大小
-            dp[i][2] = Math.max(dp[i - 1][2], dp[i - 1][1] + prices[i]);
-            //其中dp[i][3]有两个操作1）第i天没有操作2）第i天买入股票，所以此时最大收益，应该为这两个操作比大小
-            dp[i][3] = Math.max(dp[i - 1][3], dp[i - 1][2] - prices[i]);
-            //其中dp[i][4]有两个操作1）第i天没有操作2）第i天卖出股票，所以此时最大收益，应该为这两个操作比大小
-            dp[i][4] = Math.max(dp[i - 1][4], dp[i - 1][3] + prices[i]);
-        }
-        return dp[prices.length - 1][4];
-    }
-	
-	public int maxProfit03_1 (int[] prices) {
-        // write code here
-        int fstBuy=Integer.MAX_VALUE,fstSell=0;
-        int secBuy=Integer.MAX_VALUE,secSell=0;
-        for(int price:prices){
-            fstBuy=Math.min(fstBuy,price);
-            fstSell=Math.max(fstSell,price-fstBuy);
-            secBuy=Math.min(secBuy,price-fstSell);
-            secSell=Math.max(secSell,price-secBuy);
-             
-        }
-        return secSell;
-    }
+	public int maxProfit03(int[] prices) {
+		if (prices.length == 0)
+			return 0;
+		int first_hold = -prices[0], second_hold = -prices[0];
+		int first_sell = 0, second_sell = 0;
+		for (int i = 1; i < prices.length; i++) {
+			first_hold = Math.max(first_hold, -prices[i]);
+			first_sell = Math.max(first_sell, first_hold + prices[i]);
 
-	/*买卖股票的最好时机(四)
-	假设你有一个数组pricesprices，长度为nn，其中prices[i]prices[i]是某只股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
-	1. 你最多可以对该股票有kk笔交易操作，一笔交易代表着一次买入与一次卖出，但是再次购买前必须卖出之前的股票
+			second_hold = Math.max(second_hold, first_sell - prices[i]);
+			second_sell = Math.max(second_sell, second_hold + prices[i]);
+		}
+		return second_sell;
+	}
+
+	/*买卖股票的最好时机(四)--多可以对该股票有k笔交易操作
+	假设你有一个数组pricesprices，长度为nn，其中prices[i]prices[i]是某只股票在第i天的价格，
+	请根据这个价格数组，返回买卖股票能获得的最大收益
+	1. 你最多可以对该股票有k笔交易操作，一笔交易代表着一次买入与一次卖出，但是再次购买前必须卖出之前的股票
 	2. 如果不能获取收益，请返回0
 	3. 假设买入卖出均无手续费
 	数据范围:
@@ -149,22 +168,21 @@ public class StockProfile {
 	2. 0 <= prices[i] <= 1000
 	3. 0 <= k <= 100
 	*/
-	public int maxProfit05 (int[] prices, int k) {
-        // write code here
-        if(prices.length <=1 || k == 0){
-            return 0;
-        }
-        int len = prices.length;
-        int [] buy = new int[len+1];
-        int [] sell = new int[len+1];
-        Arrays.fill(buy,-prices[0]);
-        Arrays.fill(sell,0);
-        for(int p : prices){
-            for(int i=1;i<=k;i++){
-                buy[i] = Math.max(buy[i],sell[i-1] - p);
-                sell[i] = Math.max(sell[i],buy[i] + p);
-            }
-        }
-        return sell[k];
-    }
+	public int maxProfit04(int[] prices, int k) {
+		if (prices.length <= 1 || k == 0) {
+			return 0;
+		}
+		int len = prices.length;
+		int[] buy = new int[len + 1];
+		int[] sell = new int[len + 1];
+		Arrays.fill(buy, -prices[0]);
+		Arrays.fill(sell, 0);
+		for (int p : prices) {
+			for (int i = 1; i <= k; i++) {
+				buy[i] = Math.max(buy[i], sell[i - 1] - p);
+				sell[i] = Math.max(sell[i], buy[i] + p);
+			}
+		}
+		return sell[k];
+	}
 }

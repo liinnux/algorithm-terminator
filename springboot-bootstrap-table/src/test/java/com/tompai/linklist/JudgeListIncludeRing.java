@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 /**
- * @author Administrator
+NC4 判断链表中是否有环
 判断给定的链表中是否有环。如果有环则返回true，否则返回false。
 
 
@@ -46,8 +46,10 @@ public class JudgeListIncludeRing {
         }
         return false;
     }
-	
+
+	/*NC3 链表中环的入口结点
 	//给一个长度为n链表，若其中包含环，请找出该链表的环的入口结点，否则，返回null。
+	*/	
 	public ListNode entryNodeOfLoop(ListNode pHead) {
         // 使用set来记录出现的结点
         HashSet<ListNode> set = new HashSet<>();
@@ -85,6 +87,7 @@ public class JudgeListIncludeRing {
      return null;
 	}
 	/*
+	 NC66 两个链表的第一个公共结点
 	 输入两个无环的单向链表，找出它们的第一个公共结点，如果没有公共节点则返回空。
 	 （注意因为传入数据是链表，所以错误测试数据的提示是用其他方式显示的，保证传入数据是正确的）
 	 */

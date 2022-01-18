@@ -69,35 +69,6 @@ public class Tree {
 		preOrder(root.left);
 		preOrder(root.right);
 	}
-	/*NC193 二叉树的前序遍历
-	给你二叉树的根节点 root ，返回它节点值的 前序 遍历。*/
-	public int[] preorderTraversal (TreeNode root) {
-		if(root == null){
-			return new int[0];
-		}
-
-		List<Integer> list = new ArrayList<>();
-		Stack<TreeNode> stack = new Stack<>();
-
-		TreeNode node = root;
-		while(node != null || !stack.isEmpty()){
-			while(node != null){
-				list.add(node.val);
-				stack.push(node);
-				node = node.left;
-			}
-
-			if(!stack.isEmpty()){
-				node = stack.pop();
-				node = node.right;
-			}
-		}
-		int[] arr = new int[list.size()];
-		for(int i = 0; i < list.size();i++){
-			arr[i] = list.get(i);
-		}
-		return arr;
-	}
 
 	public void inOrder(TreeNode root) {
 		if (root == null) {
@@ -108,28 +79,6 @@ public class Tree {
 		inOrder(root.right);
 	}
 
-	/*NC161 二叉树的中序遍历(左-中-右)
-	给定一个二叉树的根节点root，返回它的中序遍历结果。*/
-	public int[] inorderTraversal (TreeNode root) {
-		// write code here
-		List<Integer> list = new ArrayList<>();
-		int[] ans = new int[list.size()];
-		if(root == null) return ans;
-		list = inOrder(root,list);
-		int[] res = new int[list.size()];
-		for(int i = 0;i < list.size();i++){
-			res[i] = list.get(i);
-		}
-		return res;
-	}
-	private List<Integer> inOrder(TreeNode root,List<Integer> list){
-		if(root == null) return null;
-		inOrder(root.left,list);
-		list.add(root.val);
-		inOrder(root.right,list);
-		return list;
-	}
-
 	public void afterOrder(TreeNode root) {
 		if (root == null) {
 			return;
@@ -137,40 +86,6 @@ public class Tree {
 		afterOrder(root.left);
 		afterOrder(root.right);
 		list.add(root.val);
-	}
-
-	/*NC192 二叉树的后序遍历(左-右-中)
-	给定一个二叉树，返回他的后序遍历的序列。
-	后序遍历是值按照 左节点->右节点->根节点 的顺序的遍历。*/
-	public int[] afterOrderTraversal (TreeNode root) {
-		// write code here
-		if (root == null) {
-			return new int[0];
-		}
-		List<Integer> list = new LinkedList<>();
-		TreeNode pre = null;
-		Stack<TreeNode> stack = new Stack<>();
-		//设置一个前驱节点
-		while (root != null || !stack.isEmpty()) {
-			while (root != null) {
-				stack.push(root);
-				root = root.left;
-				//如果没有到左子树最底下的点，继续入栈
-			}
-			//取出最后一个元素，就是我们的后序遍历的第一个元素
-			root = stack.pop();
-			if (root.right != null && root.right != pre) {
-				stack.push(root);
-				root = root.right;
-				//我们这个点不空，然后且不是上一个节点，我们继续入栈
-			} else {
-				System.out.println(root.val);
-				list.add(root.val);
-				pre = root;
-				root = null;
-			}
-		}
-		return list.stream().mapToInt(Integer::intValue).toArray();
 	}
 
 	/**
@@ -295,7 +210,9 @@ public class Tree {
 		return res;
 	}
 
-	//给定一棵二叉树(保证非空)以及这棵树上的两个节点对应的val值 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
+	/*NC102 在二叉树中找到两个节点的最近公共祖先
+	给定一棵二叉树(保证非空)以及这棵树上的两个节点对应的val值 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
+	*/	
 	public int lowestCommonAncestor(TreeNode root, int o1, int o2) {
 		return helper(root, o1, o2).val;
 	}
@@ -315,7 +232,43 @@ public class Tree {
 		//我们只需要返回cur结点即可。
 		return root;
 	}
-
+	
+	/*NC102 在二叉树中找到两个节点的最近公共祖先
+	给定一棵二叉树(保证非空)以及这棵树上的两个节点对应的val值 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
+	*/	
+    public int lowestCommonAncestor02(TreeNode root, int o1, int o2) {
+        //记录遍历到的每个节点的父节点。
+        Map<Integer, Integer> parent = new HashMap<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        parent.put(root.val, Integer.MIN_VALUE);//根节点没有父节点，给他默认一个值
+        queue.add(root);
+        //直到两个节点都找到为止。
+        while (!parent.containsKey(o1) || !parent.containsKey(o2)) {
+            //队列是一边进一边出，这里poll方法是出队，
+            TreeNode node = queue.poll();
+            if (node.left != null) {
+                //左子节点不为空，记录下他的父节点
+                parent.put(node.left.val, node.val);
+                //左子节点不为空，把它加入到队列中
+                queue.add(node.left);
+            }
+            //右节点同上
+            if (node.right != null) {
+                parent.put(node.right.val, node.val);
+                queue.add(node.right);
+            }
+        }
+        Set<Integer> ancestors = new HashSet<>();
+        //记录下o1和他的祖先节点，从o1节点开始一直到根节点。
+        while (parent.containsKey(o1)) {
+            ancestors.add(o1);
+            o1 = parent.get(o1);
+        }
+        //查看o1和他的祖先节点是否包含o2节点，如果不包含再看是否包含o2的父节点……
+        while (!ancestors.contains(o2))
+            o2 = parent.get(o2);
+        return o2;
+    }
 	/*
 	给定一棵二叉树(保证非空)以及这棵树上的两个节点对应的val值 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
 	数据范围：1 \le n \le 10001≤n≤1000，树上每个节点的val满足 0<val \le 1000<val≤100
@@ -575,40 +528,7 @@ public class Tree {
 		return res;
 	}
 
-	/*
-	 二叉树中和为某一值的路径(二)
-	输入一颗二叉树的根节点root和一个整数expectNumber，找出二叉树中结点值的和为expectNumber的所有路径。
-	1.该题路径定义为从树的根结点开始往下一直到叶子结点所经过的结点
-	2.叶子节点是指没有子节点的节点
-	3.路径只能从父节点到子节点，不能从子节点到父节点
-	4.总节点数目为n
 	
-	如二叉树root为{10,5,12,4,7},expectNumber为22
-	 */
-	public void dfs(int expectNumber, TreeNode root, ArrayList<ArrayList<Integer>> ans, int count,
-			ArrayList<Integer> ans_) {
-		count += root.val;
-		ans_.add(root.val);
-		if (root.left == null && root.right == null) {
-			if (count == expectNumber) {
-				ArrayList<Integer> ans_temp = new ArrayList<>();
-				ans_temp.addAll(ans_);
-				ans.add(ans_temp);
-			}
-		}
-		if (root.left != null)
-			dfs(expectNumber, root.left, ans, count, ans_);
-		if (root.right != null)
-			dfs(expectNumber, root.right, ans, count, ans_);
-		ans_.remove(ans_.size() - 1);
-	}
-
-	public ArrayList<ArrayList<Integer>> findPath(TreeNode root, int expectNumber) {
-		ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
-		if (root != null)
-			dfs(expectNumber, root, ans, 0, new ArrayList<>());
-		return ans;
-	}
 
 	ArrayList res = new ArrayList<>();
 	LinkedList path = new LinkedList<>();
@@ -649,7 +569,7 @@ public class Tree {
 		boolean[] res = new boolean[2];
 
 		res[0] = isSerachTreeBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
-		res[1] = isAllTreeBST(root);
+		res[1] = isCompleteTree(root);
 
 		return res;
 
@@ -666,8 +586,11 @@ public class Tree {
 		return isSerachTreeBST(root.left, left, root.val) && isSerachTreeBST(root.right, root.val, right);
 	}
 
-	//判断完全树
-	public boolean isAllTreeBST(TreeNode root) {
+	/*判断完全树
+	给定一个二叉树，确定他是否是一个完全二叉树。
+	完全二叉树的定义：若二叉树的深度为 h，除第 h 层外，其它各层的结点数都达到最大个数，第 h 层所有的叶子结点都连续集中在最左边，这就是完全二叉树。（第 h 层可能包含 [1~2h] 个节点）
+	*/
+	public boolean isCompleteTree(TreeNode root) {
 		if (root == null)
 			return true;
 		Deque<TreeNode> queue = new LinkedList<>();
@@ -758,6 +681,7 @@ public class Tree {
 	}
 
 	/*
+	NC9 二叉树中和为某一值的路径(一)
 	给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径。
 	1.该题路径定义为从树的根结点开始往下一直到叶子结点所经过的结点
 	2.叶子节点是指没有子节点的节点
@@ -787,24 +711,39 @@ public class Tree {
 		// 对左右分支进行 dfs
 		return dfs2(curNode.left, target) || dfs2(curNode.right, target);
 	}
-
-	/*
-	前序遍历:这里采用的是前序遍历的递归实现方法，即：根节点-左儿子-右儿子。
-	*/
-	public boolean hasPathSum2(TreeNode root, int sum) {
-		// 根节点为空，则直接返回false
-		if (root == null) {
-			return false;
+	
+	/*NC8 二叉树中和为某一值的路径(二)
+	输入一颗二叉树的根节点root和一个整数expectNumber，找出二叉树中结点值的和为expectNumber的所有路径。
+	1.该题路径定义为从树的根结点开始往下一直到叶子结点所经过的结点
+	2.叶子节点是指没有子节点的节点
+	3.路径只能从父节点到子节点，不能从子节点到父节点
+	4.总节点数目为n*/
+	public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int expectNumber) {
+        ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
+		if (root != null)
+			dfs(expectNumber, root, ans, 0, new ArrayList<>());
+		return ans;
+    }
+    
+    public void dfs(int expectNumber, TreeNode root, ArrayList<ArrayList<Integer>> ans, int count,
+			ArrayList<Integer> ans_) {
+		count += root.val;
+		ans_.add(root.val);
+		if (root.left == null && root.right == null) {
+			if (count == expectNumber) {
+				ArrayList<Integer> ans_temp = new ArrayList<>();
+				ans_temp.addAll(ans_);
+				ans.add(ans_temp);
+			}
 		}
-		// 只有根节点，且值满足要求，则返回true
-		if (root.left == null && root.right == null && root.val == sum) {
-			return true;
-		}
-		// 递归遍历
-		return hasPathSum2(root.left, sum - root.val) || hasPathSum2(root.right, sum - root.val);
+		if (root.left != null)
+			dfs(expectNumber, root.left, ans, count, ans_);
+		if (root.right != null)
+			dfs(expectNumber, root.right, ans, count, ans_);
+		ans_.remove(ans_.size() - 1);
 	}
-
-	/*二叉树中和为某一值的路径(三)
+    
+    /*二叉树中和为某一值的路径(三)
 	给定一个二叉树root和一个整数值 sum ，求该树有多少路径的的节点值之和等于 sum 。
 	1.该题路径定义不需要从根节点开始，也不需要在叶子节点结束，但是一定是从父亲节点往下到孩子节点
 	2.总节点数目为n
@@ -832,6 +771,24 @@ public class Tree {
 		dfs5(root.left, sum);
 		dfs5(root.right, sum);
 	}
+
+	/*
+	前序遍历:这里采用的是前序遍历的递归实现方法，即：根节点-左儿子-右儿子。
+	*/
+	public boolean hasPathSum2(TreeNode root, int sum) {
+		// 根节点为空，则直接返回false
+		if (root == null) {
+			return false;
+		}
+		// 只有根节点，且值满足要求，则返回true
+		if (root.left == null && root.right == null && root.val == sum) {
+			return true;
+		}
+		// 递归遍历
+		return hasPathSum2(root.left, sum - root.val) || hasPathSum2(root.right, sum - root.val);
+	}
+
+	
 
 	/*
 	请实现两个函数，分别用来序列化和反序列化二叉树，不对序列化之后的字符串进行约束，但要求能够根据序列化之后的字符串重新构造出一棵与原二叉树相同的树。
@@ -943,13 +900,17 @@ public class Tree {
 		return -1;
 	}
 
-	/*多叉树的直径
+	/*
+	 * NC99 多叉树的直径
+	 * 多叉树的直径
 	给定一棵多叉树，求出这棵树的直径，即树上最远两点的距离。
 	包含n个结点，n-1条边的连通图称为树。
 	示例1的树如下图所示。其中4到5之间的路径最长，是树的直径，距离为5+2+4=11*/
 	/**
 	 * 树的直径
-	 * 
+	 * 给定一棵多叉树，求出这棵树的直径，即树上最远两点的距离。
+包含n个结点，n-1条边的连通图称为树。
+示例1的树如下图所示。其中4到5之间的路径最长，是树的直径，距离为5+2+4=11
 	 * @param n          int整型 树的节点个数
 	 * @param Tree_edge  Interval类一维数组 树的边
 	 * @param Edge_value int整型一维数组 边的权值
@@ -1462,26 +1423,78 @@ public class Tree {
         }
         return result;
     }
-	/*NC215 将二叉搜索树改为累加树
-	给定一个二叉搜索树，树上的节点各不相同，请你将其修改为累加树，使每个节点的值变成原树中更大节点之和。
-	二叉搜索树的定义是任一节点的左子树的任意节点的值小于根节点的值，右子树则相反。*/
-	public TreeNode convertToAddBST(TreeNode root) {
-		// write code here
-		if (root == null)
-			return null;
-		dfs_add(root);
-		return root;
-	}
-	int sum = 0;
-	public void dfs_add(TreeNode root) {
-		if (root == null)
-			return;
-		dfs_add(root.right);
-		sum += root.val;
-		root.val = sum;
-		dfs_add(root.left);
-	}
+
+	/*NC98 判断t1树中是否有与t2树完全相同的子树
+	给定彼此独立的两棵二叉树，树上的节点值两两不同，判断 t1 树是否有与 t2 树完全相同的子树。
+	子树指一棵树的某个节点的全部后继节点
+	输入：{1,2,3,4,5,6,7,#,8,9},{2,4,5,#,8,9}
+	返回值：true*/
+    public boolean isContains (TreeNode root1, TreeNode root2) {
+        // write code here
+        if(root1 == null) {
+            return false;
+        }
+        if(isSame(root1, root2)) {
+            return true;
+        }
+        return isContains(root1.left, root2) || isContains(root1.right, root2);
+    }
+     
+    public boolean isSame(TreeNode root1, TreeNode root2) {
+        if(root1 == null && root2 == null) {
+            return true;
+        }
+        if(root1 == null || root2 == null) {
+            return false;
+        }
+        if(root1.val == root2.val) {
+            return isSame(root1.left, root2.left) && isSame(root1.right, root2.right);
+        }
+        return false;
+    }
+
+	/*NC195 二叉树的直径
+	给定一颗二叉树，求二叉树的直径。
+	1.该题的直径定义为：树上任意两个节点路径长度的最大值
+	2.该题路径长度定义为：不需要从根节点开始，也不需要在叶子节点结束，也不需要必须从父节点到子节点，一个节点到底另外一个节点走的边的数目
+	3.这个路径可能穿过根节点，也可能不穿过
+	4.树为空时，返回 0
+	如，输入{1,2,3,#,#,4,5}，二叉树如下:*/
+    private int path2;
+    public int diameterOfBinaryTree (TreeNode root) {
+        // write code here
+        depth(root);
+        return path2;
+    }
+      
+    public int depth(TreeNode root) {
+        if(root == null) return 0;
+        int left = depth(root.left);
+        int right = depth(root.right);
+        path2 = Math.max((left + right), path2);
+        return Math.max(left, right) + 1;
+    }
     
+	/*NC191 二叉搜索树的最近公共祖先
+	给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+	1.对于该题的最近的公共祖先定义:对于有根树T的两个节点p、q，最近公共祖先LCA(T,p,q)表示一个节点x，满足x是p和q的祖先且x的深度尽可能大。在这里，一个节点也可以是它自己的祖先.
+	2.二叉搜索树是若它的左子树不空，则左子树上所有节点的值均小于它的根节点的值； 若它的右子树不空，则右子树上所有节点的值均大于它的根节点的值
+	3.所有节点的值都是唯一的。
+	4.p、q 为不同节点且均存在于给定的二叉搜索树中。
+	数据范围:
+	3<=节点总数<=10000
+	0<=节点值<=10000
+	如果给定以下搜索二叉树: {7,1,12,0,4,11,14,#,#,3,5}*/
+    public int lowestCommonAncestorBST (TreeNode root, int p, int q) {
+        // write code here
+        if (root.val<p&&root.val<q){
+            return lowestCommonAncestorBST(root.right,p,q);
+        }
+        if (root.val>p&&root.val>q){
+            return lowestCommonAncestorBST(root.left,p,q);
+        }
+        return root.val;
+    }
     
 	/**
 	 * @param args

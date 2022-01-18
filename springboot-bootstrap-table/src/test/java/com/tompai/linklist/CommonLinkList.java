@@ -10,14 +10,7 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * @author Administrator 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表 如果链表中的节点数不是 k
- *         的倍数，将最后剩下的节点保持原样 你不能更改节点中的值，只能更改节点本身。
- * 
- *         数据范围： \ 0 \le n \le 2000 0≤n≤2000 ， 1 \le k \le 20001≤k≤2000
- *         ，链表中每个元素都满足 0 \le val \le 10000≤val≤1000 要求空间复杂度 O(1)O(1)，时间复杂度
- *         O(n)O(n) 例如： 给定的链表是 1\to2\to3\to4\to51→2→3→4→5 对于 k = 2k=2 , 你应该返回
- *         2\to 1\to 4\to 3\to 52→1→4→3→5 对于 k = 3k=3 , 你应该返回 3\to2 \to1 \to
- *         4\to 53→2→1→4→5
+
  */
 public class CommonLinkList {
 
@@ -140,7 +133,11 @@ public class CommonLinkList {
 			p2 = p1.next;
 		}
 	}
-
+/*
+NC50 链表中的节点每k个一组翻转
+将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表 如果链表中的节点数不是 k
+的倍数，将最后剩下的节点保持原样 你不能更改节点中的值，只能更改节点本身。
+ */
 	public ListNode reverseKGroup(ListNode head, int k) {
 		// write code here
 		if (k <= 1 || head == null)
@@ -531,25 +528,43 @@ public class CommonLinkList {
 		return slow;
 	}
 
-	/*NC186 两两交换链表的节点
-	给你一个链表，请你两两交换相邻节点，你需要真正交换节点本身，而不是修改节点的值。
-	两两交换示例：
-	链表    ：1->2->3->4
-	交换后 ：2->1->4->3*/
-	public ListNode swapLinkedPair (ListNode head) {
-		// write code here
-		ListNode dummy = new ListNode(-1);
-		dummy.next = head;
-		ListNode t = dummy;
-		while(t!=null){
-			ListNode first = t.next;
-			if(first==null||first.next==null) break;
-			ListNode second = first.next;
-			t.next = second;
-			first.next = second.next;
-			second.next = first;
-			t = first;
-		}
-		return dummy.next;
-	}
+	/*NC189 给单链表加一
+	给定一个用单链表表示的整数，然后把这个整数加一。
+	数据范围：链表长度满足  ，链表上每个节点的值满足0-9  ，可以保证链表在非 0 的情况下没有前导零
+	例如输入{1,2,3}时，对应的输出为{1,2,4}*/
+	 public ListNode plusOne (ListNode head) {
+	        // write code here
+	        head = reverseList02(head);
+	        ListNode anotherHead = new ListNode(1);
+	        return reverseList02(addTwoNumbers(head, anotherHead));
+	    }
+	     
+	    private ListNode addTwoNumbers(ListNode num1, ListNode num2) {
+	        ListNode p1 = num1, p2 = num2;
+	        int carry = 0;
+	        ListNode dummy = new ListNode(-1);
+	        ListNode cur = dummy;
+	        while(p1 != null || p2 != null){
+	            int sum = carry + (p1 != null? p1.val: 0) + (p2 != null? p2.val: 0);
+	            cur.next = new ListNode(sum % 10);
+	            carry = sum / 10;
+	            if(p1 != null) p1 = p1.next;
+	            if(p2 != null) p2 = p2.next;
+	            cur = cur.next;
+	        }
+	        if(carry > 0) cur.next = new ListNode(carry);
+	        return dummy.next;
+	    }
+	     
+	    private ListNode reverseList02(ListNode head) {
+	        ListNode prev = null;
+	        ListNode cur = head;
+	        while(cur != null){
+	            ListNode next = cur.next;
+	            cur.next = prev;
+	            prev = cur;
+	            cur = next;
+	        }
+	        return prev;
+	    }
 }

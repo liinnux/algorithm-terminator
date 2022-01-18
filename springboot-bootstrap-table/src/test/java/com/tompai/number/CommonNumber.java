@@ -670,38 +670,12 @@ public class CommonNumber {
         }
         return (int)ans;
     }
-	/*NC217 给表达式添加运算符
-	给定一个仅包含数字的字符串 num 和一个目标值 target，
-	在 num 的数字之间添加二元运算符 "+" , "-" 或 "*" ,返回所有能够得到目标值的表达式。*/
-	int t,n;
-	List<String> list=new ArrayList<>();
-	char[] cc;
-	public String[] addOpt (String num, int target) {
-		// write code here
-		n=num.length();
-		t=target;
-		cc=num.toCharArray();
-		dfs("",0,0,0);
-		String[] ans=new String[list.size()];
-		for(int i=0;i<list.size();i++){
-			ans[i]=list.get(i);
-		}
-		return ans;
-	}
-	void dfs(String s,int k,int sum,int count){
-		if(k == n && sum == t){
-			list.add(s);
-		}
-		int a = 0;
-		for(int i=k;i<n&&(i==k||cc[k] != '0');i++){
-			a = a*10 + cc[i] - '0';
-			if(k == 0) dfs(s+a,i+1,a,a);
-			else{
-				dfs(s+"+"+a,i+1,sum+a,a);
-				dfs(s+"-"+a,i+1,sum-a,-a);
-				dfs(s+"*"+a,i+1,sum+a*(count-1),count*a);
-			}
-		}
-	}
+
+	/*NC68 跳台阶
+	一只青蛙一次可以跳上1级台阶，也可以跳上2级。求该青蛙跳上一个 n 级的台阶总共有多少种跳法（先后次序不同算不同的结果）。*/
+	public int jumpFloor(int number) {
+	    if (number<=1) return 1;
+	        return jumpFloor(number-1)+jumpFloor(number-2);
+	    }
 
 }

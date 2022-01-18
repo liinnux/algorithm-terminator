@@ -1,6 +1,5 @@
 package com.tompai.linklist;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -42,7 +41,10 @@ public class MergeTwoSortList {
 			return list2;
 		}
 	}
-	//合并 k 个升序的链表并将结果作为一个升序的链表返回其头节点。
+	/*
+	 NC51 合并k个已排序的链表
+	 合并 k 个升序的链表并将结果作为一个升序的链表返回其头节点。
+	 */
 	public ListNode mergeKLists(List<ListNode> lists) {
         if(lists.size() == 0){
             return null;
